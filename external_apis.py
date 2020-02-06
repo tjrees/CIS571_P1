@@ -28,13 +28,7 @@ def get_hiking_routes():
 		return json.dumps(trail_list['message'])
 
 
-@external_apis.route('/api/currentweather')
-def get_current_weather():
-	latitude = request.args.get('latitude')
-	longitude = request.args.get('longitude')
-
-	final_url = WEATHER_UNLOCKED_ENDPOINT + 'current/' + str(latitude) + ',' +  str(longitude)
-
+def send_weather_request(final_url):
 	request_params = {}
 	request_params['app_id'] = WEATHER_UNLOCKED_APP_ID
 	request_params['app_key'] = WEATHER_UNLOCKED_KEY
@@ -52,26 +46,19 @@ def get_current_weather():
 	else:
 		return 'Weather details not available'
 
+@external_apis.route('/api/currentweather')
+def get_current_weather():
+	latitude = request.args.get('latitude')
+	longitude = request.args.get('longitude')
+
+	final_url = WEATHER_UNLOCKED_ENDPOINT + 'current/' + str(latitude) + ',' +  str(longitude)
+	return send_weather_request(final_url)
+
+
 @external_apis.route('/api/forecastweather')
 def get_forecast_weather():
 	latitude = request.args.get('latitude')
 	longitude = request.args.get('longitude')
 
 	final_url = WEATHER_UNLOCKED_ENDPOINT + 'forecast/' + str(latitude) + ',' +  str(longitude)
-
-	request_params = {}
-	request_params['app_id'] = WEATHER_UNLOCKED_APP_ID
-	request_params['app_key'] = WEATHER_UNLOCKED_KEY
-
-	headers = {'Accept' : 'application/json'}
-
-	request_obj = requests.get(url = final_url, params = request_params, headers = headers)
-
-	print(request_obj)
-
-	forecast_weather = request_obj.json()
-
-	if (request_obj.status_code == requests.codes.ok):
-		return json.dumps(forecast_weather)
-	else:
-		return 'Weather details not available'
+	return send_weather_request(final_url)
