@@ -12,7 +12,7 @@ env = dict(
 	host = '0.0.0.0',
 	port = 5000,
 	user = 'root', 
-	password = 'root571GB',
+	passwd = 'root571GB',
 	db = 'CIS571_P1',
 )
 
@@ -24,6 +24,6 @@ def connect_to_database():
 		'db': env['db'],
 		'cursorclass' : pymysql.cursors.DictCursor
 	}
-	db = pymysql.connect
+	db = pymysql.connect(**options)
 	db.autocommit(True)
 	return db

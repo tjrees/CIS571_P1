@@ -5,11 +5,48 @@
 {% endblock %}
 
 {% block content %}
+
+<script id="new_user_script">
+function registerUser() {
+
+	var inputData = {
+		username: $('#new_username_input').val(),
+		password: $('#new_password_input').val(),
+		confirmpassword: $('#new_confirmpassword_input').val(),
+		name: $('#new_name_input').val(),
+		email: $('#new_email_input').val()
+	};
+
+	console.log(inputData);
+
+	var errors = [];
+	$.ajax('api/user', {
+		type: 'post',
+		contentType: 'application/json',
+		data: JSON.stringify(inputData),
+		success: function(data, status){
+			window.location.replace('login');
+		},
+		error: function(jqXHR, exception){
+			var errors = jqXHR.responseJSON.errors;
+			var text = "";
+			for(var i = 0; i < errors.length; i++) {
+				text += '<p class="error">' + errors[i].message + '</p>';
+			}
+			document.getElementById("error_messages").innerHTML = text;
+		}
+	});
+}
+</script>
+
 <h1 class="w3-text-teal">Sign up</h1>
-<p>First name:</p>
-<p>Last name:</p>
-<p>Username:</p>
-<p>Password:</p>
-<p>Confirm password:</p>
-<p>Email:</p>
+<ul>
+	<li>Username: <input type="text" text="username" id="new_username_input"></li>
+	<li>Password: <input type="password" text="password" id="new_password_input"></li>
+	<li>Confirm Password: <input type="password" text="password" id="new_confirmpassword_input"></li>
+	<li>Name: <input type="text" text="name" id="new_name_input"></li>
+	<li>Email: <input type="text" text="email" id="new_email_input"></li>
+	<li><button type="button" onclick="registerUser()" id="new_user_submit">Submit</button></li>
+</ul>
+
 {% endblock %}
