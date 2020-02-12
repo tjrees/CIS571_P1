@@ -1,2 +1,3 @@
 __pycache__/
 *.pyc
+set_secret_key.sh

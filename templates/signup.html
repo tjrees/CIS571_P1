@@ -17,8 +17,6 @@ function registerUser() {
 		email: $('#new_email_input').val()
 	};
 
-	console.log(inputData);
-
 	var errors = [];
 	$.ajax('api/user', {
 		type: 'post',
@@ -40,6 +38,10 @@ function registerUser() {
 </script>
 
 <h1 class="w3-text-teal">Sign up</h1>
+<p>
+Register with our website to create a user account. Using it, you'll be able to save your favorite
+trails and trips in the future.
+</p>
 <ul>
 	<li>Username: <input type="text" text="username" id="new_username_input"></li>
 	<li>Password: <input type="password" text="password" id="new_password_input"></li>

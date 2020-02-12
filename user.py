@@ -1,7 +1,7 @@
 # user.py
 from flask import *
 from config import *
-import os, hashlib, re, uuid
+import os, hashlib, re, uuid, datetime, jwt
 
 user_api = Blueprint('user_api', __name__, template_folder='templates')
 
@@ -93,6 +93,42 @@ def hash_password(password):
 	database_password = salt + '$' + hash_str
 	return database_password
 
+def encode_token(username):
+	token_payload = {
+		'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1),
+		'iat': datetime.datetime.utcnow(),
+		'sub': username
+	}
+	token = jwt.encode(token_payload, SECRET_KEY, algorithm='HS256')
+	return token.hex()
+
+def decode_token(hextoken, username):
+	token = bytes.fromhex(hextoken)
+	try:
+		token_payload = jwt.decode(token, SECRET_KEY)
+		return token_payload['sub']
+	except jwt.ExpiredSignatureError:
+		return 'Token is expired. Please log in again.'
+	except jwt.InvalidTokenError:
+		return 'Invalid token. Please log in.'
+
+def verify_login(username, password):
+	db = connect_to_database()
+	cursor = db.cursor()
+	query = 'SELECT password FROM Users WHERE username = %s'
+	cursor.execute(query, (username,))
+	database_password = cursor.fetchone()['password']
+
+	split_password = database_password.split('$')
+	salt = split_password[0]
+	hashed_password = split_password[1]
+
+	test_hash = hashlib.new('sha512')
+	test_hash.update(str(salt + password).encode('utf-8'))
+	test_hash_str = test_hash.hexdigest()
+	return (test_hash_str == hashed_password)
+
+
 # API routes
 @user_api.route('/api/user', methods=['POST'])
 def api_register_user():
@@ -122,5 +158,31 @@ def api_register_user():
 	db = connect_to_database()
 	cursor = db.cursor()
 	query = 'INSERT INTO Users (username, password, name, email) VALUES (%s, %s, %s, %s)'
-	cursor.execute(query, (username, password, name, email))
+	cursor.execute(query, (username, database_password, name, email))
 	return jsonify(result='New user successfully created'), 201
+
+@user_api.route('/api/login', methods=['POST'])
+def api_login_user():
+	request_data = request.get_json()
+	if ('username' not in request_data or
+		'password' not in request_data):
+
+		errors = []
+		errors.append({'message':'Login request must contain a username and password'})
+		return jsonify(errors=errors), 400
+
+	username = request_data['username']
+	password = request_data['password']
+
+	# Give the user a token if the login is successful. Send an error message otherwise
+	if verify_login(username, password):
+		token = encode_token(username)
+		print(token)
+		return jsonify({'token':token}), 200
+
+	else:
+		errors = []
+		errors.append({'message': 'Login failed; either username or password is incorrect'})
+		return jsonify(errors=errors), 401
+
+
