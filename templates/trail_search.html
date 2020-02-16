@@ -7,8 +7,14 @@
 {% block content %}
 <h1 class="w3-text-teal">Search for trails!</h1>
 <p>
-Using this application, you'll be able to search for hiking routes anywhere in the world by putting in
-the coordinates and pressing the "Search" button. From there, you can save your favorites to access them
-at any time.
+Search for hiking trails anywhere in the world by putting in the coordinates and pressing the "Search"
+button. From there, using your token (<a href="{{url_for('login_screen')}}">log in</a> to get it), you
+can save these trails to your profile. Then use the trip planning tab to plan a trip from your saved
+trails.
 </p>
+<form action="{{ url_for('search_results_screen') }}" method="get">
+	Latitude:  <input type="text" id="latitude_input" name="latitude"><br>
+	Longitude: <input type="text" id="longitude_input" name="longitude"><br>
+	<input type="submit" id="submit_trail_search" value="Search">
+</form>
 {% endblock %}

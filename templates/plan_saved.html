@@ -1,0 +1,83 @@
+{% extends "index.html" %}
+
+{% block title %}
+<title>Hiking Trip Planner - Plan</title>
+{% endblock %}
+
+{% block content %}
+<script id="plan_trip_script">
+function getSelectedTrails() {
+	var trails = [];
+
+	var resultsList = document.getElementById('results_list');
+	var resultsValues = resultsList.getElementsByTagName('li');
+
+	for(var i = 0; i < resultsValues.length; i++){
+		var checkbox = resultsValues[i].getElementsByTagName('input')[0];
+		if (checkbox.checked){
+			trails.push(checkbox.value);
+		}
+	}
+	return trails;
+}
+
+function planTrip() {
+	// TODO: SOAP API for planning a trip
+	trails = getSelectedTrails();
+	console.log('TODO!');
+
+}
+
+function deleteSavedTrails() {
+	var inputData = {
+		token: $('#trail_delete_token_input').val(),
+		trails: getSelectedTrails()
+	}
+	var errors = []
+	$.ajax('/api/trails', {
+		type: 'delete',
+		contentType: 'application/json',
+		data: JSON.stringify(inputData),
+		success: function(data, status){
+			window.location.reload(true);
+		},
+		error: function(jqXHR, exception){
+			var errors = jqXHR.responseJSON.errors;
+			var text = "";
+			for(var i = 0; i < errors.length; i++) {
+				text += '<p class="error">' + errors[i].message + '</p>';
+			}
+			document.getElementById("error_messages").innerHTML = text;
+		}
+	})
+}
+</script>
+
+<h1 class="w3-text-teal">Plan your trip!</h1>
+<p>
+Select saved trails that you want to include in your trip, or delete saved trails
+from your profile.
+</p>
+
+Auth token: <input type="text" text="token" id="trail_delete_token_input"><br><br>
+<button type="button" onclick="deleteSavedTrails()" id="trail_delete_submit">Delete selected trails</button><br><br>
+
+<button type="button" onclick="planTrip()" id="plan_trip_submit">Plan trip with selected trails!</button><br>
+
+<ul id="results_list">
+	{% for trail in trail_list %}
+		<li>
+			<label for="{{trail.id}}">
+				<h4 class="w3-text-teal">{{trail.name}}</h4>
+				<img src="{{trail.imgSqSmall}}"><br>
+				Rating: {{trail.stars}}/5.0<br>
+				Difficulty: {{trail.difficulty}}<br>
+				Length: {{trail.length}} miles<br>
+				Summary: {{trail.summary}}<br>
+			</label><br>
+			<input type="checkbox" id="trail_checkbox" name="{{trail.name}}" value="{{trail.id}}">
+			Select this trail<br>
+		</li>
+	{% endfor %}
+</ul>
+{% endblock %}

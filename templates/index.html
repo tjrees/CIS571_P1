@@ -17,9 +17,9 @@
 		<div class="w3-top">
 			<div class="w3-bar w3-theme w3-top w3-left-align w3-large">
 				<a class="w3-bar-item w3-button w3-right w3-hide-large w3-hover-white w3-large w3-theme-l1" href="javascript:void(0)" onclick="w3_open()"><i class="fa fa-bars"></i></a>
-				<a href="/#" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Login</a>
-				<a href="/#" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Search</a>
-				<a href="/#" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Plan</a>
+				<a href="{{ url_for('login_screen') }}" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Login</a>
+				<a href="{{ url_for('search_screen') }}" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Search</a>
+				<a href="{{ url_for('plan_screen') }}" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Plan</a>
 			</div>
 		</div>
 
@@ -27,6 +27,7 @@
 
 			<div class="w3-row w3-padding-64">
 				<div class="w3-twothird w3-container">
+					<div id="error_messages"></div>
 				{% block content %}
 					<h1 class="w3-text-teal">Plan your hiking trip!</h1>
 					<p>Using this application, you'll be able to search for hiking routes anywhere in the world by putting in
@@ -37,7 +38,6 @@
 			</div>
 		</div>
 
-	<div id="error_messages"></div>
 	</body>
 
 

@@ -1,0 +1,71 @@
+{% extends "index.html" %}
+
+{% block title %}
+<title>Hiking Trip Planner - Search Results</title>
+{% endblock %}
+
+{% block content %}
+<script id="save_trails_script">
+function saveSelectedTrails() {
+	var trails = [];
+
+	var resultsList = document.getElementById('results_list');
+	var resultsValues = resultsList.getElementsByTagName('li');
+
+	for(var i = 0; i < resultsValues.length; i++){
+		var checkbox = resultsValues[i].getElementsByTagName('input')[0];
+		if (checkbox.checked){
+			trails.push(checkbox.value);
+		}
+	}
+
+	var inputData = {
+		token: $('#trail_save_token_input').val(),
+		trails: trails
+	};
+
+	var errors = [];
+	$.ajax('/api/trails', {
+		type: 'post',
+		contentType: 'application/json',
+		data: JSON.stringify(inputData),
+		success: function(data, status){
+			window.location.replace('/search');
+		},
+		error: function(jqXHR, exception){
+			var errors = jqXHR.responseJSON.errors;
+			var text = "";
+			for(var i = 0; i < errors.length; i++) {
+				text += '<p class="error">' + errors[i].message + '</p>';
+			}
+			document.getElementById("error_messages").innerHTML = text;
+		}
+	});
+}
+</script>
+
+<h1 class="w3-text-teal">Trail search results</h1>
+<p>
+Select trails to save them and plan a trip with them later!
+</p>
+
+Auth token: <input type="text" text="token" id="trail_save_token_input"><br><br>
+<button type="button" onclick="saveSelectedTrails()" id="trail_save_submit">Save selected trails</button><br>
+
+<ul id="results_list">
+	{% for trail in trail_list %}
+		<li>
+			<label for="{{trail.id}}">
+				<h4 class="w3-text-teal">{{trail.name}}</h4>
+				<img src="{{trail.imgSqSmall}}"><br>
+				Rating: {{trail.stars}}/5.0<br>
+				Difficulty: {{trail.difficulty}}<br>
+				Length: {{trail.length}} miles<br>
+				Summary: {{trail.summary}}<br>
+			</label><br>
+			<input type="checkbox" id="trail_checkbox" name="{{trail.name}}" value="{{trail.id}}">
+			Select this trail<br>
+		</li>
+	{% endfor %}
+</ul>
+{% endblock %}

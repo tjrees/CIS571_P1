@@ -1,0 +1,17 @@
+{% extends "index.html" %}
+
+{% block title %}
+<title>Hiking Trip Planner - Plan</title>
+{% endblock %}
+
+{% block content %}
+<h1 class="w3-text-teal">Plan your trip!</h1>
+<p>
+Enter your token to view all your saved trails.
+From there you can plan your hiking trip!
+</p>
+<form action="{{ url_for('plan_saved_screen') }}" method="get">
+	Auth token:  <input type="text" id="token_input" name="token"><br>
+	<input type="submit" id="submit_saved_trails" value="Get saved trails">
+</form>
+{% endblock %}
