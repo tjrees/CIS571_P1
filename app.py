@@ -1,11 +1,13 @@
 from flask import Flask, render_template, redirect, url_for, request
 from external_apis import *
 from apis import *
+from soap import *
 import config
 
 
 app = Flask(__name__)
 app.register_blueprint(my_api)
+app.register_blueprint(soap_api)
 
 @app.route('/', methods=['GET'])
 def index():

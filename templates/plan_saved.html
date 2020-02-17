@@ -22,10 +22,63 @@ function getSelectedTrails() {
 }
 
 function planTrip() {
-	// TODO: SOAP API for planning a trip
-	trails = getSelectedTrails();
-	console.log('TODO!');
 
+	var trails = getSelectedTrails();
+	var xmldoc = document.implementation.createDocument('http://schemas.xmlsoap.org/soap/envelope', 'soap:Envelope')
+	var body = document.createElementNS('http://schemas.xmlsoap.org/soap/envelope', 'soap:Body');
+
+	var getTripGear = document.createElementNS(null, 'getTripGear');
+	var trailsTag = document.createElementNS(null, 'Trails');
+
+	for (var i = 0; i < trails.length; i++){
+		var trailIDTag = document.createElementNS(null, 'Trail_ID');
+		trailIDTag.textContent = trails[i];
+		trailsTag.appendChild(trailIDTag);
+	}
+	getTripGear.appendChild(trailsTag);
+	body.appendChild(getTripGear);
+	xmldoc.documentElement.appendChild(body);
+
+	var serializer = new XMLSerializer();
+	var xmlstring = serializer.serializeToString(xmldoc.documentElement);
+
+	//console.log(xmlstring)
+
+	var errors = []
+	$.ajax('/soap/servlet/messagerouter', {
+		type: 'post',
+		contentType: 'text/xml',
+		data: xmlstring,
+		success: function(data, status){
+			console.log('success!!!')
+			var parser = new DOMParser();
+			var envelope = parser.parseFromString(data, 'text/xml');
+			var bodyTag = envelope.documentElement.getElementsByTagName('soap:Body')[0];
+			var responseData = bodyTag.getElementsByTagName('getTripGearResponse')[0];
+			var gearTag = responseData.getElementsByTagName('Gear')[0];
+
+			var gearList = responseData.getElementsByTagName('Item');
+
+			gearHTML = ''
+			for(var i = 0; i < gearList.length; i++){
+				itemName = gearList[i].getElementsByTagName('Name')[0].textContent;
+				itemInfo = gearList[i].getElementsByTagName('Info')[0].textContent;
+				gearHTML += '<li><h4 class="w3-text-teal">' + itemName + '</h4><p>'+ itemInfo + '</p></li>'
+			}
+
+			document.getElementById('p_page_title').innerHTML = 'Gear list for your trip!'
+			document.getElementById('p_description').innerHTML = 'Here is a list of items you should make sure to have with you when you go on this trip. These are based on the length and difficulty of your trails, as well as forecast min and max temperatures, wind speeds, and rainfall over the next seven days in those areas.';
+			document.getElementById('p_auth_token').innerHTML = '';
+			document.getElementById('p_delete_button').innerHTML = '';
+			document.getElementById('p_plan_button').innerHTML = '';
+			document.getElementById('results_list').innerHTML = gearHTML;
+
+		},
+		error: function(jqXHR, exception){
+			// We shouldn't get here from the web page
+			console.log('error!!!')
+		}
+	})
 }
 
 function deleteSavedTrails() {
@@ -53,16 +106,14 @@ function deleteSavedTrails() {
 }
 </script>
 
-<h1 class="w3-text-teal">Plan your trip!</h1>
-<p>
+<h1 class="w3-text-teal" id="p_page_title">Plan your trip!</h1>
+<p id="p_description">
 Select saved trails that you want to include in your trip, or delete saved trails
 from your profile.
 </p>
-
-Auth token: <input type="text" text="token" id="trail_delete_token_input"><br><br>
-<button type="button" onclick="deleteSavedTrails()" id="trail_delete_submit">Delete selected trails</button><br><br>
-
-<button type="button" onclick="planTrip()" id="plan_trip_submit">Plan trip with selected trails!</button><br>
+<p id="p_auth_token">Auth token: <input type="text" text="token" id="trail_delete_token_input"></p>
+<p id="p_delete_button"><button type="button" onclick="deleteSavedTrails()" id="trail_delete_submit">Delete selected trails</button></p>
+<p id="p_plan_button"><button type="button" onclick="planTrip()" id="plan_trip_submit">Plan trip with selected trails!</button></p>
 
 <ul id="results_list">
 	{% for trail in trail_list %}
