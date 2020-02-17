@@ -4,11 +4,15 @@ from config import *
 import requests
 import json
 
-def get_hiking_routes(latitude, longitude):
+def get_hiking_routes(latitude, longitude, maxDistance='', minLength=''):
 	request_params = {}
 	request_params['key'] = HIKING_PROJECT_KEY
 	request_params['lat'] = latitude
 	request_params['lon'] = longitude
+	if maxDistance != '':
+		request_params['maxDistance'] = maxDistance
+	if minLength != '':
+		request_params['minLength'] = minLength
 
 	request_obj = requests.get(url = HIKING_PROJECT_ENDPOINT + 'get-trails', params = request_params)
 

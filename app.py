@@ -25,11 +25,13 @@ def search_screen():
 def search_results_screen():
 	latitude = request.args.get('latitude')
 	longitude = request.args.get('longitude')
+	maxDistance = request.args.get('maxDistance')
+	minLength = request.args.get('minLength')
 
 	if (not latitude or not longitude):
 		return redirect(url_for('search_screen'))
 
-	results = get_hiking_routes(latitude, longitude)
+	results = get_hiking_routes(latitude, longitude, maxDistance, minLength)
 
 	options = {
 		'trail_list': results['trails']

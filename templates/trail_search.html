@@ -15,6 +15,9 @@ trails.
 <form action="{{ url_for('search_results_screen') }}" method="get">
 	Latitude:  <input type="text" id="latitude_input" name="latitude"><br>
 	Longitude: <input type="text" id="longitude_input" name="longitude"><br>
+	*Max Distance (miles) <input type="text" id="distance_input" name="maxDistance"><br>
+	*Minimum Length (miles) <input type="text" id="length_input" name="minLength"><br>
 	<input type="submit" id="submit_trail_search" value="Search">
-</form>
+</form><br>
+* - Optional field
 {% endblock %}
