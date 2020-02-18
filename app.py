@@ -53,6 +53,8 @@ def plan_saved_screen():
 		return redirect(url_for('plan_screen'))
 
 	results = get_saved_trails(token)
+	if results == 'EXPIRED' or results == 'INVALID':
+		return redirect(url_for('login_screen'))
 
 	options = {
 		'trail_list': results['trails']
@@ -62,6 +64,10 @@ def plan_saved_screen():
 @app.route('/signup', methods=['GET'])
 def signup_screen():
 	return render_template('signup.html')
+
+@app.route('/delete', methods=['GET'])
+def delete_screen():
+	return render_template('delete_account.html')
 
 
 if __name__ == '__main__':

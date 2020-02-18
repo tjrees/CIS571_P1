@@ -1,0 +1,46 @@
+{% extends "index.html" %}
+
+{% block title %}
+<title>Hiking Trip Planner - Delete Account</title>
+{% endblock %}
+
+{% block content %}
+<script id="delete_script">
+function deleteAccount() {
+
+	var inputData = {
+		username: $('#delete_username_input').val(),
+		password: $('#delete_password_input').val()
+	};
+
+	var errors = [];
+	$.ajax('api/user', {
+		type: 'delete',
+		contentType: 'application/json',
+		data: JSON.stringify(inputData),
+		success: function(data, status){
+			document.getElementById("error_messages").innerHTML = '<p class="token">Your account has been successfully deleted!';
+		},
+		error: function(jqXHR, exception){
+			var errors = jqXHR.responseJSON.errors;
+			var text = "";
+			for(var i = 0; i < errors.length; i++) {
+				text += '<p class="error">' + errors[i].message + '</p>';
+			}
+			document.getElementById("error_messages").innerHTML = text;
+		}
+	});
+}
+</script>
+
+<h1 class="w3-text-teal">Delete Account</h1>
+<p>
+Enter your username and password to delete your account. Remember, this action is permanent and 
+accounts cannot be recovered!
+</p>
+<ul>
+	<li>Username: <input type="text" text="username" id="delete_username_input"></li>
+	<li>Password: <input type="password" text="password" id="delete_password_input"></li>
+	<li><button type="button" onclick="deleteAccount()" id="delete_submit">Submit</button></li>
+</ul>
+{% endblock %}

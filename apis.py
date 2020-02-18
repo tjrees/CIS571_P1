@@ -238,7 +238,7 @@ def get_saved_trails(token):
 	results = cursor.fetchall()
 	if not results:
 		return {'trails':[]}
-		
+
 	trail_ids = []
 	for result in results:
 		trail_ids.append(result['trail'])
@@ -276,7 +276,8 @@ def api_save_trails():
 			try:
 				cursor.execute(query, (trail_id, username))
 			except:
-				# Duplicate entries will be accepted
+				# Duplicate entries will not be created, but will not
+				# throw an error
 				pass
 
 		return jsonify(result='Trails have been successfully saved'), 201
@@ -304,7 +305,7 @@ def api_save_trails():
 		request_data = request.get_json()
 		if ('token' not in request_data):
 			errors = []
-			errors.append({'message':'Request to delete saved tarails must include an authentication token'})
+			errors.append({'message':'Request to delete saved trails must include an authentication token'})
 			return jsonify(errors=errors), 400
 
 		token = request_data['token']
